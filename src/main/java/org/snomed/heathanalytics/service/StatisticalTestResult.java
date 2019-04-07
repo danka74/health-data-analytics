@@ -85,8 +85,17 @@ public class StatisticalTestResult {
 		if (hasTestVariableHasOutcomeCount == 0 || hasTestVariableCount == 0 ||
 				hasNotTestVariableHasOutcomeCount == 0 || hasNotTestVariableCount == 0) return "-";
 
-		return new BigDecimal(((float)hasTestVariableHasOutcomeCount / (float)hasTestVariableCount)/
-				((float)hasNotTestVariableHasOutcomeCount / (float)hasNotTestVariableCount)).setScale(2, BigDecimal.ROUND_HALF_UP).toString();
+		double p1 = (double)hasTestVariableHasOutcomeCount / (double)hasTestVariableCount;
+		double p2 = (double)hasNotTestVariableHasOutcomeCount / (double)hasNotTestVariableCount;
+
+		double hr = p1/p2;
+
+		double se = Math.sqrt((1-p1)/(p1*(double)hasTestVariableCount) + (1-p2)/(p2*(double)hasNotTestVariableCount));
+
+		double ci_upper = Math.exp(Math.log(hr) + 1.96 * se);
+		double ci_lower = Math.exp(Math.log(hr) - 1.96 * se);
+
+		return new BigDecimal(hr).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + " (" + new BigDecimal(ci_lower).toString() + ", " + new BigDecimal(ci_upper).toString();
 	}
 
 	private String getFractionAsPercentage(int a, int b) {
